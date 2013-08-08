@@ -39,20 +39,22 @@ module ActsAsNestedInterval
       dependent: nested_interval_dependent
     scope :roots, -> { where(nested_interval_foreign_key => nil) }
       
-    if columns_hash["rgt"]
-      scope :preorder, -> { order('rgt DESC, lftp ASC') }
-    elsif columns_hash["rgtp"] && columns_hash["rgtq"]
-      scope :preorder, -> { order('1.0 * rgtp / rgtq DESC, lftp ASC') }
-    else
-      scope :preorder, -> { order('nested_interval_rgt(lftp, lftq) DESC, lftp ASC') }
-    end
+    if self.table_exists? # Fix problem with migrating without table
+      if columns_hash["rgt"]
+        scope :preorder, -> { order('rgt DESC, lftp ASC') }
+      elsif columns_hash["rgtp"] && columns_hash["rgtq"]
+        scope :preorder, -> { order('1.0 * rgtp / rgtq DESC, lftp ASC') }
+      else
+        scope :preorder, -> { order('nested_interval_rgt(lftp, lftq) DESC, lftp ASC') }
+      end
 
-    before_create :create_nested_interval
-    before_destroy :destroy_nested_interval
-    before_update :update_nested_interval
-      
-    include ActsAsNestedInterval::InstanceMethods
-    extend ActsAsNestedInterval::ClassMethods
+      before_create :create_nested_interval
+      before_destroy :destroy_nested_interval
+      before_update :update_nested_interval
+        
+      include ActsAsNestedInterval::InstanceMethods
+      extend ActsAsNestedInterval::ClassMethods
+    end
   end
 
 end
