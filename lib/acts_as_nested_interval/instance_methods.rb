@@ -176,14 +176,22 @@ module ActsAsNestedInterval
 
     # Returns depth by counting ancestors up to 0 / 1.
     def depth
-      n = 0
-      p, q = lftp, lftq
-      while p != 0
-        x = p.inverse(q)
-        p, q = (x * p - 1) / q, x
-        n += 1
+      if new_record?
+        if parent_id.nil?
+          return 0
+        else
+          return parent.depth + 1
+        end
+      else
+        n = 0
+        p, q = lftp, lftq
+        while p != 0
+          x = p.inverse(q)
+          p, q = (x * p - 1) / q, x
+          n += 1
+        end
+        return n
       end
-      n
     end
 
     def lft; 1.0 * lftp / lftq end
