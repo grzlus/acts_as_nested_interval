@@ -111,7 +111,9 @@ module ActsAsNestedInterval
       end
     end
     
+    # Rewrite method
     def update_nested_interval_move
+      return if self.class.readonly_attributes.include?(nested_interval_foreign_key.to_sym) # Fix issue #9
       begin
         db_self = self.class.find(id)
         db_parent = self.class.find(read_attribute(nested_interval_foreign_key))
