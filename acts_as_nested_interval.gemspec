@@ -7,9 +7,9 @@ require "acts_as_nested_interval/version"
 Gem::Specification.new do |s|
   s.name        = "acts_as_nested_interval"
   s.version     = ActsAsNestedInterval::VERSION
-  s.authors     = ["Nicolae Claudius", "Pythonic"]
-  s.email       = ["nicolae_claudius@yahoo.com"]
-  s.homepage    = "https://github.com/clyfe/acts_as_nested_interval"
+  s.authors     = ["Nicolae Claudius", "Pythonic", "Grzegorz Łuszczek"]
+  s.email       = ["grzegorz@piklus.pl"]
+  s.homepage    = "https://github.com/grzlus/acts_as_nested_interval"
   s.summary     = "Encode Trees in RDBMS using nested interval method."
   s.description = "Encode Trees in RDBMS using nested interval method for powerful querying and speedy inserts."
 
