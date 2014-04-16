@@ -75,20 +75,6 @@ module ActsAsNestedInterval
       end
     end
 
-    # Creates record.
-    def create_nested_interval
-      if read_attribute(nested_interval_foreign_key).nil?
-        set_nested_interval_for_top
-      else
-        set_nested_interval *parent.lock!.next_child_lft
-      end
-    end
-
-    # Destroys record.
-    def destroy_nested_interval
-      lock! rescue nil
-    end
-
     def nested_interval_scope
       conditions = {}
       nested_interval_scope_columns.each do |column_name|
@@ -97,20 +83,6 @@ module ActsAsNestedInterval
       self.class.where conditions
     end
 
-    # Updates record, updating descendants if parent association updated,
-    # in which case caller should first acquire table lock.
-    def update_nested_interval
-      changed = send(:"#{nested_interval_foreign_key}_changed?")
-      if !changed
-        db_self = self.class.find(id, :lock => true)
-        write_attribute(nested_interval_foreign_key, db_self.read_attribute(nested_interval_foreign_key))
-        set_nested_interval db_self.lftp, db_self.lftq
-      else
-        # No locking in this case -- caller should have acquired table lock.
-        update_nested_interval_move
-      end
-    end
-    
     # Rewrite method
     def update_nested_interval_move
       return if self.class.readonly_attributes.include?(nested_interval_foreign_key.to_sym) # Fix issue #9
