@@ -9,20 +9,23 @@
 # from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
-# It's strongly recommended to check this file into your version control system.
+# It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121004204252) do
+ActiveRecord::Schema.define(version: 20121004204252) do
 
-  create_table "regions", :force => true do |t|
-    t.boolean "fiction",                                   :default => false, :null => false
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "regions", force: true do |t|
+    t.boolean "fiction",                             default: false, null: false
     t.integer "region_id"
-    t.integer "lftp",                                                         :null => false
-    t.integer "lftq",                                                         :null => false
-    t.integer "rgtp",                                                         :null => false
-    t.integer "rgtq",                                                         :null => false
-    t.decimal "lft",       :precision => 31, :scale => 30,                    :null => false
-    t.decimal "rgt",       :precision => 31, :scale => 30,                    :null => false
-    t.string  "name",                                                         :null => false
+    t.integer "lftp",                                                null: false
+    t.integer "lftq",                                                null: false
+    t.integer "rgtp",                                                null: false
+    t.integer "rgtq",                                                null: false
+    t.decimal "lft",       precision: 31, scale: 30,                 null: false
+    t.decimal "rgt",       precision: 31, scale: 30,                 null: false
+    t.string  "name",                                                null: false
   end
 
 end
