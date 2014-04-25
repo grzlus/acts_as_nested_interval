@@ -77,6 +77,8 @@ Example:
 
 ```ruby
 class Region < ActiveRecord::Base
+  include ActsAsNestedInterval
+
   acts_as_nested_interval
 end
 
