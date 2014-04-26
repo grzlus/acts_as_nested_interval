@@ -6,6 +6,7 @@
 
 require 'acts_as_nested_interval/core_ext/integer'
 require 'acts_as_nested_interval/version'
+require 'acts_as_nested_interval/configuration'
 require 'acts_as_nested_interval/callbacks'
 require 'acts_as_nested_interval/instance_methods'
 require 'acts_as_nested_interval/class_methods'
@@ -25,6 +26,12 @@ module ActsAsNestedInterval
     # * <tt>:virtual_root</tt> -- whether to compute root's interval as in an upper root (default false)
     # * <tt>:dependent</tt> -- dependency between the parent node and children nodes (default :restrict)
     def acts_as_nested_interval(options = {})
+      # Refactored
+      cattr_reader :nested_interval
+
+      @nested_interval = Configuration.new( **options )
+
+      # OLD CODE
       cattr_accessor :nested_interval_foreign_key
       cattr_accessor :nested_interval_scope_columns
       cattr_accessor :nested_interval_lft_index
