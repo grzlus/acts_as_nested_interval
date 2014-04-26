@@ -1,13 +1,14 @@
 module ActsAsNestedInterval
   class Configuration
 
-    attr_reader :foreign_key, :dependent
+    attr_reader :foreign_key, :dependent, :scope_columns
 
     # multiple_roots - allow more than one root
     def initialize( model, virtual_root: false, foreign_key: :parent_id, dependent: :restrict_with_exception, scope_columns: [] )
       @multiple_roots = !!virtual_root
       @foreign_key = foreign_key
       @dependent = dependent
+      @scope_columns = *scope_columns
 
       check_model_columns( model )
     end

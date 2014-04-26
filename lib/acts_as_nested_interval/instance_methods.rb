@@ -5,7 +5,7 @@ module ActsAsNestedInterval
     # selectively define #descendants according to table features
     included do
       
-      if columns_hash["lft"]
+      if nested_interval.fraction_cache?
 
         def descendants
           #quoted_table_name = self.class.quoted_table_name
@@ -16,31 +16,31 @@ module ActsAsNestedInterval
           nested_interval_scope.where( "lftp > :lftp AND lft BETWEEN :lft AND :rgt", lftp: lftp, rgt: rgt, lft: lft )
         end
         
-      elsif nested_interval_lft_index
+      #elsif nested_interval_lft_index
         
-        def descendants
-          quoted_table_name = self.class.quoted_table_name
-          nested_interval_scope.where <<-SQL
-              #{lftp} < #{quoted_table_name}.lftp AND 
-              1.0 * #{quoted_table_name}.lftp / #{quoted_table_name}.lftq BETWEEN 
-                #{1.0 * lftp / lftq} AND
-                #{1.0 * rgtp / rgtq}
-          SQL
-        end
+        #def descendants
+          #quoted_table_name = self.class.quoted_table_name
+          #nested_interval_scope.where <<-SQL
+              ##{lftp} < #{quoted_table_name}.lftp AND 
+              #1.0 * #{quoted_table_name}.lftp / #{quoted_table_name}.lftq BETWEEN 
+                ##{1.0 * lftp / lftq} AND
+                ##{1.0 * rgtp / rgtq}
+          #SQL
+        #end
         
-      elsif connection.adapter_name == "MySQL"
+      #elsif connection.adapter_name == "MySQL"
         
-        def descendants
-          quoted_table_name = self.class.quoted_table_name
-          nested_interval_scope.where <<-SQL
-              ( #{quoted_table_name}.lftp != #{rgtp} OR 
-                #{quoted_table_name}.lftq != #{rgtq}
-              ) AND
-              #{quoted_table_name}.lftp BETWEEN 
-                1 + #{quoted_table_name}.lftq * #{lftp} DIV #{lftq} AND 
-                #{quoted_table_name}.lftq * #{rgtp} DIV #{rgtq}
-          SQL
-        end
+        #def descendants
+          #quoted_table_name = self.class.quoted_table_name
+          #nested_interval_scope.where <<-SQL
+              #( #{quoted_table_name}.lftp != #{rgtp} OR 
+                ##{quoted_table_name}.lftq != #{rgtq}
+              #) AND
+              ##{quoted_table_name}.lftp BETWEEN 
+                #1 + #{quoted_table_name}.lftq * #{lftp} DIV #{lftq} AND 
+                ##{quoted_table_name}.lftq * #{rgtp} DIV #{rgtq}
+          #SQL
+        #end
         
       else
         
@@ -69,7 +69,7 @@ module ActsAsNestedInterval
     end
     
     def set_nested_interval_for_top
-      if self.class.virtual_root
+      if nested_interval.multiple_roots?
         set_nested_interval(*next_root_lft)
       else
         set_nested_interval 0, 1
@@ -78,7 +78,7 @@ module ActsAsNestedInterval
 
     def nested_interval_scope
       conditions = {}
-      nested_interval_scope_columns.each do |column_name|
+      nested_interval.scope_columns.each do |column_name|
         conditions[column_name] = send(column_name)
       end
       self.class.where conditions

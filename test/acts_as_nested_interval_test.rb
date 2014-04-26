@@ -195,6 +195,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
 
   def test_virtual_root_order
+    # TODO: Fix this test
     Region.virtual_root = true
     r1 = Region.create name: "1"
     r2 = Region.create name: "2"
