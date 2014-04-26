@@ -31,7 +31,7 @@ module ActsAsNestedInterval
       # TODO: table_exists?
       cattr_accessor :nested_interval
 
-      nested_interval = Configuration.new( self, **options )
+      self.nested_interval = Configuration.new( self, **options )
 
       if nested_interval.fraction_cache?
         scope :preorder, -> { order(rgt: :desc, lftp: :asc) }
@@ -43,7 +43,7 @@ module ActsAsNestedInterval
 
 
       # OLD CODE
-      cattr_accessor :nested_interval_foreign_key
+      #cattr_accessor :nested_interval_foreign_key
       cattr_accessor :nested_interval_scope_columns
       cattr_accessor :nested_interval_lft_index
       cattr_accessor :nested_interval_dependent
@@ -51,15 +51,15 @@ module ActsAsNestedInterval
       cattr_accessor :virtual_root
       self.virtual_root = !!options[:virtual_root]
 
-      self.nested_interval_foreign_key = options[:foreign_key] || :parent_id
+      #self.nested_interval_foreign_key = options[:foreign_key] || :parent_id
       self.nested_interval_scope_columns = Array(options[:scope_columns])
       self.nested_interval_lft_index = options[:lft_index]
       self.nested_interval_dependent = options[:dependent] || :restrict_with_exception
 
-      belongs_to :parent, class_name: name, foreign_key: nested_interval_foreign_key
-      has_many :children, class_name: name, foreign_key: nested_interval_foreign_key,
+      belongs_to :parent, class_name: name, foreign_key: nested_interval.foreign_key
+      has_many :children, class_name: name, foreign_key: nested_interval.foreign_key,
         dependent: nested_interval.dependent
-      scope :roots, -> { where(nested_interval_foreign_key => nil) }
+      scope :roots, -> { where(nested_interval.foreign_key => nil) }
 
       if self.table_exists? # Fix problem with migrating without table
         include ActsAsNestedInterval::InstanceMethods

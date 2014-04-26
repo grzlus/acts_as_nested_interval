@@ -21,7 +21,7 @@ module ActsAsNestedInterval
       update_subtree = ->(node){
         node.create_nested_interval
         node.save
-        node.class.unscoped.where(nested_interval_foreign_key => node.id).find_each &update_subtree
+        node.class.unscoped.where(nested_interval.foreign_key => node.id).find_each &update_subtree
       }
       unscoped.roots.find_each &update_subtree
 

@@ -86,18 +86,18 @@ module ActsAsNestedInterval
 
     # Rewrite method
     def update_nested_interval_move
-      return if self.class.readonly_attributes.include?(nested_interval_foreign_key.to_sym) # Fix issue #9
+      return if self.class.readonly_attributes.include?(nested_interval.foreign_key.to_sym) # Fix issue #9
       begin
         db_self = self.class.find(id)
-        db_parent = self.class.find(read_attribute(nested_interval_foreign_key))
+        db_parent = self.class.find(read_attribute(nested_interval.foreign_key))
         if db_self.ancestor_of?(db_parent)
-          errors.add nested_interval_foreign_key, "is descendant"
+          errors.add nested_interval.foreign_key, "is descendant"
           raise ActiveRecord::RecordInvalid, self
         end
       rescue ActiveRecord::RecordNotFound => e # root
       end
       
-      if read_attribute(nested_interval_foreign_key).nil? # root move
+      if read_attribute(nested_interval.foreign_key).nil? # root move
         set_nested_interval_for_top
       else # child move
         set_nested_interval *parent.next_child_lft
