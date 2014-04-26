@@ -36,7 +36,7 @@ module ActsAsNestedInterval
       self.nested_interval_foreign_key = options[:foreign_key] || :parent_id
       self.nested_interval_scope_columns = Array(options[:scope_columns])
       self.nested_interval_lft_index = options[:lft_index]
-      self.nested_interval_dependent = options[:dependent] || :restrict
+      self.nested_interval_dependent = options[:dependent] || :restrict_with_exception
 
       belongs_to :parent, class_name: name, foreign_key: nested_interval_foreign_key
       has_many :children, class_name: name, foreign_key: nested_interval_foreign_key,
@@ -59,4 +59,5 @@ module ActsAsNestedInterval
     end
   end
 end
+
 #ActiveRecord::Base.send :extend, ActsAsNestedInterval

@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    acts_as_nested_interval (0.1.1)
-      rails (>= 3.2.1, < 5)
+    acts_as_nested_interval (0.2.0.pre)
+      activesupport (>= 3.2.1, < 5)
 
 GEM
   remote: http://rubygems.org/
@@ -45,7 +45,8 @@ GEM
     mime-types (1.25.1)
     minitest (5.3.3)
     multi_json (1.9.2)
-    pg (0.13.2)
+    mysql2 (0.3.15)
+    pg (0.17.1)
     polyglot (0.3.4)
     rack (1.5.2)
     rack-test (0.6.2)
@@ -90,5 +91,7 @@ PLATFORMS
 
 DEPENDENCIES
   acts_as_nested_interval!
+  mysql2
   pg
+  rails
   sqlite3

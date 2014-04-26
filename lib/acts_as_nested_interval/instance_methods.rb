@@ -6,13 +6,14 @@ module ActsAsNestedInterval
     included do
       
       if columns_hash["lft"]
-        
+
         def descendants
-          quoted_table_name = self.class.quoted_table_name
-          nested_interval_scope.where <<-SQL
+          #quoted_table_name = self.class.quoted_table_name
+          #nested_interval_scope.where <<-SQL
               #{lftp} < #{quoted_table_name}.lftp AND 
               #{quoted_table_name}.lft BETWEEN #{1.0 * lftp / lftq} AND #{1.0 * rgtp / rgtq}
-          SQL
+          #SQL
+          nested_interval_scope.where( "lftp > :lftp AND lft BETWEEN :lft AND :rgt", lftp: lftp, rgt: rgt, lft: lft )
         end
         
       elsif nested_interval_lft_index
@@ -108,7 +109,8 @@ module ActsAsNestedInterval
 
       updates = {}
       vars = Set.new
-      mysql = ["MySQL", "Mysql2"].include?(connection.adapter_name)
+      # TODO
+      mysql = false #["MySQL", "Mysql2"].include?(connection.adapter_name)
       var = ->(v) { mysql ? vars.add?(v) ? "(@#{v} := #{v})" : "@#{v}" : v }
       multiply = ->(c, b) { "#{c} * #{var.(b)}" }
       add = ->(a, b) { "#{a} + #{b}" }
@@ -135,6 +137,10 @@ module ActsAsNestedInterval
         node.lftp > node.lftq * lftp / lftq &&
         node.lftp <= node.lftq * rgtp / rgtq &&
         (node.lftp != rgtp || node.lftq != rgtq)
+    end
+
+    def new_ancestors
+      nested_interval_scope.where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: rgt, lft: lft)
     end
 
     def ancestors

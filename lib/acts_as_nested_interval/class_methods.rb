@@ -6,7 +6,7 @@ module ActsAsNestedInterval
       # temporary changes
       skip_callback :update, :before, :update_nested_interval
       old_default_scopes = default_scopes # save to revert later
-      default_scope where("#{quoted_table_name}.lftq > 0") # use lft1 > 0 as a "migrated?" flag
+      default_scope ->{ where("#{quoted_table_name}.lftq > 0") } # use lft1 > 0 as a "migrated?" flag
           
       # zero all intervals
       update_hash = {lftp: 0, lftq: 0}

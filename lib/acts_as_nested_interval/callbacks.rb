@@ -29,7 +29,7 @@ module ActsAsNestedInterval
     def update_nested_interval
       changed = send(:"#{nested_interval_foreign_key}_changed?")
       if !changed
-        db_self = self.class.find(id, :lock => true)
+        db_self = self.class.find(id).lock!
         write_attribute(nested_interval_foreign_key, db_self.read_attribute(nested_interval_foreign_key))
         set_nested_interval db_self.lftp, db_self.lftq
       else
