@@ -6,6 +6,7 @@
 
 require 'acts_as_nested_interval/core_ext/integer'
 require 'acts_as_nested_interval/version'
+require 'acts_as_nested_interval/constants'
 require 'acts_as_nested_interval/configuration'
 require 'acts_as_nested_interval/callbacks'
 require 'acts_as_nested_interval/instance_methods'
@@ -27,9 +28,19 @@ module ActsAsNestedInterval
     # * <tt>:dependent</tt> -- dependency between the parent node and children nodes (default :restrict)
     def acts_as_nested_interval(options = {})
       # Refactored
-      cattr_reader :nested_interval
+      # TODO: table_exists?
+      cattr_accessor :nested_interval
 
-      @nested_interval = Configuration.new( **options )
+      nested_interval = Configuration.new( self, **options )
+
+      if nested_interval.fraction_cache?
+        scope :preorder, -> { order(rgt: :desc, lftp: :asc) }
+      else
+        scope :preorder, -> { order('1.0 * rgtp / rgtq DESC, lftp ASC') }
+      end
+      # When?
+      #scope :preorder, -> { order('nested_interval_rgt(lftp, lftq) DESC, lftp ASC') }
+
 
       # OLD CODE
       cattr_accessor :nested_interval_foreign_key
@@ -47,18 +58,10 @@ module ActsAsNestedInterval
 
       belongs_to :parent, class_name: name, foreign_key: nested_interval_foreign_key
       has_many :children, class_name: name, foreign_key: nested_interval_foreign_key,
-        dependent: nested_interval_dependent
+        dependent: nested_interval.dependent
       scope :roots, -> { where(nested_interval_foreign_key => nil) }
 
       if self.table_exists? # Fix problem with migrating without table
-        if columns_hash["rgt"]
-          scope :preorder, -> { order('rgt DESC, lftp ASC') }
-        elsif columns_hash["rgtp"] && columns_hash["rgtq"]
-          scope :preorder, -> { order('1.0 * rgtp / rgtq DESC, lftp ASC') }
-        else
-          scope :preorder, -> { order('nested_interval_rgt(lftp, lftq) DESC, lftp ASC') }
-        end
-
         include ActsAsNestedInterval::InstanceMethods
         include ActsAsNestedInterval::Callbacks
         extend ActsAsNestedInterval::ClassMethods
