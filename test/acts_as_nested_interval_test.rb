@@ -1,5 +1,9 @@
 require 'test_helper'
 
+def set_virtual_root( value )
+  Region.nested_interval.instance_eval("@multiple_roots = #{ value }")
+end
+
 class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   def test_modular_inverse
     assert_equal [nil, 1, 5, nil, 7, 2, nil, 4, 8], (0...9).map { |k| k.inverse(9) }
@@ -195,8 +199,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
 
   def test_virtual_root_order
-    # TODO: Fix this test
-    Region.virtual_root = true
+    set_virtual_root( true )
     r1 = Region.create name: "1"
     r2 = Region.create name: "2"
     r3 = Region.create name: "3"
@@ -205,7 +208,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
   
   def test_virtual_root_allocation
-    Region.virtual_root = true
+    set_virtual_root( true )
     r1 = Region.create name: "Europe"
     r2 = Region.create name: "Romania", :parent => r1
     r3 = Region.create name: "Asia"
@@ -216,7 +219,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
   
   def test_rebuild_nested_interval_tree
-    Region.virtual_root = true
+    set_virtual_root( true )
     r1 = Region.create name: "Europe"
     r2 = Region.create name: "Romania", parent: r1
     r3 = Region.create name: "Asia"
@@ -228,7 +231,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
   
   def test_root_update_keeps_interval
-    Region.virtual_root = true
+    set_virtual_root( true )
     r1 = Region.create name: "Europe"
     r2 = Region.create name: "Romania", parent: r1
     r3 = Region.create name: "Asia"
@@ -240,7 +243,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
   
   def test_move_to_root_recomputes_interval
-    Region.virtual_root = true
+    set_virtual_root( true )
     r1 = Region.create name: "Europe"
     r2 = Region.create name: "Romania", parent: r1
     r3 = Region.create name: "Asia"
