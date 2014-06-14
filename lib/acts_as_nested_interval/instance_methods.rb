@@ -4,60 +4,29 @@ module ActsAsNestedInterval
     
     # selectively define #descendants according to table features
     included do
-      
+
       if nested_interval.fraction_cache?
 
         def descendants
-          #quoted_table_name = self.class.quoted_table_name
-          #nested_interval_scope.where <<-SQL
-              #{lftp} < #{quoted_table_name}.lftp AND 
-              #{quoted_table_name}.lft BETWEEN #{1.0 * lftp / lftq} AND #{1.0 * rgtp / rgtq}
-          #SQL
           nested_interval_scope.where( "lftp > :lftp AND lft BETWEEN :lft AND :rgt", lftp: lftp, rgt: rgt, lft: lft )
         end
-        
-      #elsif nested_interval_lft_index
-        
-        #def descendants
-          #quoted_table_name = self.class.quoted_table_name
-          #nested_interval_scope.where <<-SQL
-              ##{lftp} < #{quoted_table_name}.lftp AND 
-              #1.0 * #{quoted_table_name}.lftp / #{quoted_table_name}.lftq BETWEEN 
-                ##{1.0 * lftp / lftq} AND
-                ##{1.0 * rgtp / rgtq}
-          #SQL
-        #end
-        
-      #elsif connection.adapter_name == "MySQL"
-        
-        #def descendants
-          #quoted_table_name = self.class.quoted_table_name
-          #nested_interval_scope.where <<-SQL
-              #( #{quoted_table_name}.lftp != #{rgtp} OR 
-                ##{quoted_table_name}.lftq != #{rgtq}
-              #) AND
-              ##{quoted_table_name}.lftp BETWEEN 
-                #1 + #{quoted_table_name}.lftq * #{lftp} DIV #{lftq} AND 
-                ##{quoted_table_name}.lftq * #{rgtp} DIV #{rgtq}
-          #SQL
-        #end
-        
+
       else
-        
+
         def descendants
           quoted_table_name = self.class.quoted_table_name
           nested_interval_scope.where <<-SQL
               ( #{quoted_table_name}.lftp != #{rgtp} OR
-                #{quoted_table_name}.lftq != #{rgtq}
+          #{quoted_table_name}.lftq != #{rgtq}
               ) AND
-              #{quoted_table_name}.lftp BETWEEN
+          #{quoted_table_name}.lftp BETWEEN
                 1 + #{quoted_table_name}.lftq * CAST(#{lftp} AS BIGINT) / #{lftq} AND
-                #{quoted_table_name}.lftq * CAST(#{rgtp} AS BIGINT) / #{rgtq}
+          #{quoted_table_name}.lftq * CAST(#{rgtp} AS BIGINT) / #{rgtq}
           SQL
         end
-        
+
       end
-      
+
     end
     
     def set_nested_interval(lftp, lftq)
@@ -139,20 +108,20 @@ module ActsAsNestedInterval
         (node.lftp != rgtp || node.lftq != rgtq)
     end
 
-    def new_ancestors
+    def ancestors
       nested_interval_scope.where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: rgt, lft: lft)
     end
 
-    def ancestors
-      sqls = ['0 = 1']
-      p, q = lftp, lftq
-      while p != 0
-        x = p.inverse(q)
-        p, q = (x * p - 1) / q, x
-        sqls << "lftq = #{q} AND lftp = #{p}"
-      end
-      nested_interval_scope.where(sqls * ' OR ')
-    end
+    #def ancestors
+      #sqls = ['0 = 1']
+      #p, q = lftp, lftq
+      #while p != 0
+        #x = p.inverse(q)
+        #p, q = (x * p - 1) / q, x
+        #sqls << "lftq = #{q} AND lftp = #{p}"
+      #end
+      #nested_interval_scope.where(sqls * ' OR ')
+    #end
 
     # Returns depth by counting ancestors up to 0 / 1.
     def depth
