@@ -13,8 +13,20 @@ Gem::Specification.new do |s|
   s.summary     = "Encode Trees in RDBMS using nested interval method."
   s.description = "Encode Trees in RDBMS using nested interval method for powerful querying and speedy inserts."
 
+  spec.required_ruby_version = '>= 2.0'
+
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "activesupport", ">= 3.2.1", "< 5"
+
+  s.post_install_message = <<-END
+ New version of acts_as_nested_interval has a lot of changes (could crash your app!):
+
+ * Refactored code
+ * Added cache for depth
+ * Simpler queries
+ * Droped support for rails 1.9 and 1.8 (Keywords arguments, Refinements)
+ * Added more configure option
+  END
 end

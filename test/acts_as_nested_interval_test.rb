@@ -158,6 +158,7 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
   end
 
   def test_database_precision
+    Region.all.delete_all
     root = Region.create name: 'root'
     l1=Region.create(name: 'l1', parent: root)
     l2=Region.create(name: 'l2', parent: l1)
