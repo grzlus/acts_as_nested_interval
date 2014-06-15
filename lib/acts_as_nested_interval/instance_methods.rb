@@ -1,5 +1,8 @@
 module ActsAsNestedInterval
   module InstanceMethods
+
+    using Mediant
+
     extend ActiveSupport::Concern
     
     # selectively define #descendants according to table features
@@ -31,8 +34,8 @@ module ActsAsNestedInterval
 
     end
     
-    def set_nested_interval(lftp, lftq)
-      self.lftp, self.lftq = lftp, lftq
+    def set_nested_interval(rational)
+      self.lftp, self.lftq = rational.numerator, rational.denominator
       self.rgtp = rgtp if has_attribute?(:rgtp)
       self.rgtq = rgtq if has_attribute?(:rgtq)
       self.lft = lft if has_attribute?(:lft)
@@ -40,11 +43,7 @@ module ActsAsNestedInterval
     end
     
     def set_nested_interval_for_top
-      if nested_interval.multiple_roots?
-        set_nested_interval(*next_root_lft)
-      else
-        set_nested_interval 0, 1
-      end
+      set_nested_interval next_root_lft
     end
 
     def nested_interval_scope
@@ -71,7 +70,7 @@ module ActsAsNestedInterval
       if read_attribute(nested_interval.foreign_key).nil? # root move
         set_nested_interval_for_top
       else # child move
-        set_nested_interval *parent.next_child_lft
+        set_nested_interval parent.next_child_lft
       end
       cpp = db_self.lftq * rgtp - db_self.rgtq * lftp
       cpq = db_self.rgtp * lftp - db_self.lftp * rgtp
@@ -155,21 +154,22 @@ module ActsAsNestedInterval
     # Returns left end of interval for next child.
     def next_child_lft
       if child = children.order('lftq DESC').first
-        return lftp + child.lftp, lftq + child.lftq
+        return left.mediant( child.left )
       else
-        return lftp + rgtp, lftq + rgtq
+        return left.mediant( right )
       end
     end
     
     # Returns left end of interval for next root.
     def next_root_lft
       vr = self.class.new # a virtual root
-      vr.set_nested_interval 0, 1
+      vr.set_nested_interval 0.to_r
       if child = nested_interval_scope.roots.order('lftq DESC').first
-        return vr.lftp + child.lftp, vr.lftq + child.lftq
+        return vr.left.mediant( child.left )
       else
-        return vr.lftp + vr.rgtp, vr.lftq + vr.rgtq
+        return vr.left.mediant( vr.right )
       end
+      #nested_interval_scope.roots.order( rgtp: :desc, rgtq: :desc ).first.try(:right) || 0.to_r
     end
     
     # Check if node is moved (parent changed)

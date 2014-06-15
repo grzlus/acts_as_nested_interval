@@ -20,7 +20,7 @@ module ActsAsNestedInterval
       if read_attribute(nested_interval.foreign_key).nil?
         set_nested_interval_for_top
       else
-        set_nested_interval *parent.lock!.next_child_lft
+        set_nested_interval parent.lock!.next_child_lft
       end
     end
 
@@ -30,7 +30,7 @@ module ActsAsNestedInterval
       unless node_moved?
         db_self = self.class.find(id).lock!
         write_attribute(nested_interval.foreign_key, db_self.read_attribute(nested_interval.foreign_key))
-        set_nested_interval db_self.lftp, db_self.lftq
+        set_nested_interval Rational(db_self.lftp, db_self.lftq)
       else
         # No locking in this case -- caller should have acquired table lock.
         update_nested_interval_move
