@@ -5,6 +5,8 @@ module ActsAsNestedInterval
     # selectively define #descendants according to table features
     included do
 
+      validate :disallow_circular_dependency
+
       if nested_interval.fraction_cache?
 
         def descendants
@@ -55,7 +57,7 @@ module ActsAsNestedInterval
 
     # Rewrite method
     def update_nested_interval_move
-      return if self.class.readonly_attributes.include?(nested_interval.foreign_key.to_sym) # Fix issue #9
+      return unless self.class.nested_interval.moveable?
       begin
         db_self = self.class.find(id)
         db_parent = self.class.find(read_attribute(nested_interval.foreign_key))
@@ -102,26 +104,12 @@ module ActsAsNestedInterval
     end
     
     def ancestor_of?(node)
-      node.lftp == lftp && node.lftq == lftq ||
-        node.lftp > node.lftq * lftp / lftq &&
-        node.lftp <= node.lftq * rgtp / rgtq &&
-        (node.lftp != rgtp || node.lftq != rgtq)
+      left < node.left && right >= node.right
     end
 
     def ancestors
       nested_interval_scope.where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: rgt, lft: lft)
     end
-
-    #def ancestors
-      #sqls = ['0 = 1']
-      #p, q = lftp, lftq
-      #while p != 0
-        #x = p.inverse(q)
-        #p, q = (x * p - 1) / q, x
-        #sqls << "lftq = #{q} AND lftp = #{p}"
-      #end
-      #nested_interval_scope.where(sqls * ' OR ')
-    #end
 
     # Returns depth by counting ancestors up to 0 / 1.
     def depth
@@ -184,5 +172,26 @@ module ActsAsNestedInterval
       end
     end
     
+    # Check if node is moved (parent changed)
+    def node_moved?
+      send(:"#{nested_interval.foreign_key}_changed?") # TODO: Check if parent moved?
+    end
+
+    def left
+      Rational(lftp, lftq)
+    end
+
+    def right
+      Rational(rgtp, rgtq)
+    end
+
+    protected
+
+    def disallow_circular_dependency
+      if parent == self
+        errors.add(self.class.nested_interval.foreign_key, 'cannot refer back to self')
+      end
+    end
+
   end
 end

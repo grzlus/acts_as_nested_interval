@@ -4,11 +4,12 @@ module ActsAsNestedInterval
     attr_reader :foreign_key, :dependent, :scope_columns
 
     # multiple_roots - allow more than one root
-    def initialize( model, virtual_root: false, foreign_key: :parent_id, dependent: :restrict_with_exception, scope_columns: [] )
+    def initialize( model, virtual_root: false, foreign_key: :parent_id, dependent: :restrict_with_exception, scope_columns: [], moveable: true)
       @multiple_roots = !!virtual_root
-      @foreign_key = foreign_key
+      @foreign_key = foreign_key.to_sym
       @dependent = dependent
       @scope_columns = *scope_columns
+      @moveable = moveable && !model.readonly_attributes.include?(foreign_key) # Fix issue #9
 
       check_model_columns( model )
     end
@@ -19,6 +20,10 @@ module ActsAsNestedInterval
 
     def fraction_cache?
       @fraction_cache
+    end
+
+    def moveable?
+      @moveable
     end
 
     private

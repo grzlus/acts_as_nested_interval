@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    acts_as_nested_interval (0.2.0.pre)
+    acts_as_nested_interval (0.3.0.pre)
       activesupport (>= 3.2.1, < 5)
 
 GEM

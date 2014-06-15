@@ -28,7 +28,6 @@ module ActsAsNestedInterval
     # * <tt>:dependent</tt> -- dependency between the parent node and children nodes (default :restrict)
     def acts_as_nested_interval(options = {})
       # Refactored
-      # TODO: table_exists?
       cattr_accessor :nested_interval
 
       self.nested_interval = Configuration.new( self, **options )
@@ -41,20 +40,8 @@ module ActsAsNestedInterval
       # When?
       #scope :preorder, -> { order('nested_interval_rgt(lftp, lftq) DESC, lftp ASC') }
 
-
-      # OLD CODE
-      #cattr_accessor :nested_interval_foreign_key
-      #cattr_accessor :nested_interval_scope_columns
-      cattr_accessor :nested_interval_lft_index
-      #cattr_accessor :nested_interval_dependent
-
-      cattr_accessor :virtual_root
-      self.virtual_root = !!options[:virtual_root]
-
-      #self.nested_interval_foreign_key = options[:foreign_key] || :parent_id
-      #self.nested_interval_scope_columns = Array(options[:scope_columns])
-      self.nested_interval_lft_index = options[:lft_index]
-      #self.nested_interval_dependent = options[:dependent] || :restrict_with_exception
+      #cattr_accessor :nested_interval_lft_index
+      #self.nested_interval_lft_index = options[:lft_index]
 
       belongs_to :parent, class_name: name, foreign_key: nested_interval.foreign_key
       has_many :children, class_name: name, foreign_key: nested_interval.foreign_key,
