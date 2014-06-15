@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.md"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "activesupport", ">= 3.2.1", "< 5"
+  s.add_dependency "activesupport", ">= 4.0"
 
   s.post_install_message = <<-END
  New version of acts_as_nested_interval has a lot of changes (could crash your app!):

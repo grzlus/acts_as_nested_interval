@@ -5,6 +5,7 @@
 # https://github.com/clyfe
 
 require 'acts_as_nested_interval/core_ext/integer'
+require 'acts_as_nested_interval/core_ext/rational'
 require 'acts_as_nested_interval/version'
 require 'acts_as_nested_interval/constants'
 require 'acts_as_nested_interval/configuration'
