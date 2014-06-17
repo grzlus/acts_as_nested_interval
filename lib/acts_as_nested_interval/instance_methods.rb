@@ -162,14 +162,14 @@ module ActsAsNestedInterval
     
     # Returns left end of interval for next root.
     def next_root_lft
-      vr = self.class.new # a virtual root
-      vr.set_nested_interval 0.to_r
-      if child = nested_interval_scope.roots.order('lftq DESC').first
-        return vr.left.mediant( child.left )
-      else
-        return vr.left.mediant( vr.right )
-      end
-      #nested_interval_scope.roots.order( rgtp: :desc, rgtq: :desc ).first.try(:right) || 0.to_r
+      #vr = self.class.new # a virtual root
+      #vr.set_nested_interval 0.to_r
+      #if child = nested_interval_scope.roots.order('lftq DESC').first
+        #return vr.left.mediant( child.left )
+      #else
+        #return vr.left.mediant( vr.right )
+      #end
+      nested_interval_scope.roots.order( rgtp: :desc, rgtq: :desc ).first.try(:right) || 0.to_r
     end
     
     # Check if node is moved (parent changed)
