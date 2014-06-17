@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "activesupport", ">= 4.0"
+  s.add_development_dependency "rspec-rails"
 
   s.post_install_message = <<-END
  New version of acts_as_nested_interval has a lot of changes (could crash your app!):

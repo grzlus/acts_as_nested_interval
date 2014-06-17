@@ -64,7 +64,7 @@ module ActsAsNestedInterval
           errors.add nested_interval.foreign_key, "is descendant"
           raise ActiveRecord::RecordInvalid, self
         end
-      rescue ActiveRecord::RecordNotFound => e # root
+      rescue ActiveRecord::RecordNotFound
       end
       
       if read_attribute(nested_interval.foreign_key).nil? # root move
