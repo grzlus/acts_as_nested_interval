@@ -169,7 +169,9 @@ module ActsAsNestedInterval
       #else
         #return vr.left.mediant( vr.right )
       #end
-      nested_interval_scope.roots.order( rgtp: :desc, rgtq: :desc ).first.try(:right) || 0.to_r
+      last_root = nested_interval_scope.roots.order( rgtp: :desc, rgtq: :desc ).first
+      raise Exception.new("Not good") if last_root.present? && !self.class.nested_interval.multiple_roots?
+      last_root.try(:right) || 0.to_r
     end
     
     # Check if node is moved (parent changed)

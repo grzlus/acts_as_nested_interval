@@ -1,5 +1,5 @@
 class Region < ActiveRecord::Base
   include ActsAsNestedInterval
 
-  acts_as_nested_interval :foreign_key => :region_id, :scope_columns => :fiction
+  acts_as_nested_interval :foreign_key => :region_id, :scope_columns => :fiction, :virtual_root => false
 end
