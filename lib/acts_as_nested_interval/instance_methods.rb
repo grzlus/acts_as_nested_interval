@@ -113,7 +113,7 @@ module ActsAsNestedInterval
     # Returns depth by counting ancestors up to 0 / 1.
     def depth
       if new_record?
-        if parent_id.nil?
+        if parent.nil?
           return 0
         else
           return parent.depth + 1

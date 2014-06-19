@@ -14,5 +14,11 @@ RSpec.describe Region, type: :model do
         Region.create( name: "Another root" )
       end.to raise_error
     end
+
+    it "can check depth on new record" do
+      region = Region.new
+      expect { region.depth }.not_to raise_error
+      expect(region.depth).to eq(0)
+    end
   end
 end
