@@ -110,6 +110,11 @@ module ActsAsNestedInterval
       nested_interval_scope.where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: rgt, lft: lft)
     end
 
+    def siblings
+      fkey = self.class.nested_interval.foreign_key
+      self.class.where( fkey => send(fkey) ).where.not(id: self.id)
+    end
+
     # Returns depth by counting ancestors up to 0 / 1.
     def depth
       if new_record?
