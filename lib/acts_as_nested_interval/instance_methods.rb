@@ -162,13 +162,6 @@ module ActsAsNestedInterval
     
     # Returns left end of interval for next root.
     def next_root_lft
-      #vr = self.class.new # a virtual root
-      #vr.set_nested_interval 0.to_r
-      #if child = nested_interval_scope.roots.order('lftq DESC').first
-        #return vr.left.mediant( child.left )
-      #else
-        #return vr.left.mediant( vr.right )
-      #end
       last_root = nested_interval_scope.roots.order( rgtp: :desc, rgtq: :desc ).first
       raise Exception.new("Not good") if last_root.present? && !self.class.nested_interval.multiple_roots?
       last_root.try(:right) || 0.to_r

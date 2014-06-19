@@ -9,61 +9,6 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
     assert_equal [nil, 1, 5, nil, 7, 2, nil, 4, 8], (0...9).map { |k| k.inverse(9) }
   end
 
-  def test_create_root
-    earth = Region.create name: "Earth"
-    assert_equal [0, 1], [earth.lftp, earth.lftq]
-    assert_equal [1, 1], [earth.rgtp, earth.rgtq]
-    assert_equal 1.0 * 0 / 1, earth.lft
-    assert_equal 1.0 * 1 / 1, earth.rgt
-    assert_equal [earth], Region.roots
-  end
-
-  def test_create_first_child
-    earth = Region.new name: "Earth"
-    oceania = Region.new name: "Oceania", parent: earth
-    oceania.save!
-    assert_equal [1, 2], [oceania.lftp, oceania.lftq]
-    assert_equal [1, 1], [oceania.rgtp, oceania.rgtq]
-    assert_equal 1.0 * 1 / 2, oceania.lft
-    assert_equal 1.0 * 1 / 1, oceania.rgt
-  end
-
-  def test_create_second_child
-    earth = Region.create name: "Earth"
-    oceania = Region.create name: "Oceania", parent: earth
-    australia = Region.create name: "Australia", parent: oceania
-    new_zealand = Region.create name: "New Zealand", parent: oceania
-    assert_equal [2, 3], [australia.lftp, australia.lftq]
-    assert_equal [1, 1], [australia.rgtp, australia.rgtq]
-    assert_equal 1.0 * 2 / 3, australia.lft
-    assert_equal 1.0 * 1 / 1, australia.rgt
-    assert_equal [3, 5], [new_zealand.lftp, new_zealand.lftq]
-    assert_equal [2, 3], [new_zealand.rgtp, new_zealand.rgtq]
-    assert_equal 1.0 * 3 / 5, new_zealand.lft
-    assert_equal 1.0 * 2 / 3, new_zealand.rgt
-  end
-
-  def test_append_child
-    earth = Region.create name: "Earth"
-    oceania = Region.new name: "Oceania"
-    earth.children << oceania
-    assert_equal [1, 2], [oceania.lftp, oceania.lftq]
-    assert_equal [1, 1], [oceania.rgtp, oceania.rgtq]
-    assert_equal 1.0 * 1 / 2, oceania.lft
-    assert_equal 1.0 * 1 / 1, oceania.rgt
-  end
-
-  def test_ancestors
-    earth = Region.create name: "Earth"
-    oceania = Region.create name: "Oceania", parent: earth
-    australia = Region.create name: "Australia", parent: oceania
-    new_zealand = Region.create name: "New Zealand", parent: oceania
-    assert_equal [], earth.ancestors
-    assert_equal [earth], oceania.ancestors
-    assert_equal [earth, oceania], australia.ancestors
-    assert_equal [earth, oceania], new_zealand.ancestors
-  end
-
   def test_descendants
     earth = Region.create name: "Earth"
     oceania = Region.create name: "Oceania", parent: earth
@@ -187,15 +132,6 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
     krypton = Region.create name: "Krypton", fiction: true
     assert_equal [earth], oceania.ancestors
     assert_equal [], krypton.descendants
-  end
-
-  def test_limits
-    region = Region.create name: ""
-    22.times do
-      Region.create name: "", parent: region
-      region = Region.create name: "", parent: region
-    end
-    region.descendants
   end
 
   #def test_virtual_root_order
