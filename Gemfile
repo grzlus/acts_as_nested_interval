@@ -9,7 +9,6 @@ gem 'rails'
 gem 'pg'
 gem 'mysql2'
 gem 'sqlite3'
-gem 'pry'
 
 # jquery-rails is used by the dummy application
 #gem "jquery-rails"

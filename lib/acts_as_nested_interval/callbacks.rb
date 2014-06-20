@@ -17,11 +17,7 @@ module ActsAsNestedInterval
 
     # Creates record.
     def create_nested_interval
-      if read_attribute(nested_interval.foreign_key).nil?
-        set_nested_interval_for_top
-      else
-        set_nested_interval parent.lock!.next_child_lft
-      end
+      set_nested_interval(parent.present? ? parent.next_child_lft : next_root_lft )
     end
 
     # Updates record, updating descendants if parent association updated,
