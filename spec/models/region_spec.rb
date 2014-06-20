@@ -4,6 +4,7 @@ RSpec.describe Region, type: :model do
   let(:oceania) { Region.create( name: "Oceania", parent: earth ) }
   let(:australia) { Region.create( name: "Australia", parent: oceania ) }
   let(:new_zeland) { Region.create( name: "New Zeland", parent: oceania ) }
+  let(:pacific) { Region.create(name: "Pacific", parent: earth) }
 
   describe "#callbacks" do
     it "create_with_coordinates" do
@@ -65,6 +66,30 @@ RSpec.describe Region, type: :model do
       expect(australia.depth).to eq(2)
       expect(new_zeland.depth).to eq(2)
     end
+
+    it "test moving" do
+      expect do
+        oceania.parent = oceania
+        oceania.save!
+      end.to raise_error
+
+      expect do
+        oceania.parent = australia
+        oceania.save!
+      end.to raise_error
+
+      australia; new_zeland
+
+      moved = oceania
+      moved.parent = pacific
+      moved.save!
+      moved.reload
+
+      expect(moved.ancestors).to eq([earth, pacific])
+      expect(moved.descendants).to eq([australia, new_zeland])
+      expect(pacific.descendants).to eq([oceania, australia, new_zeland])
+
+    end 
 
   end
 end

@@ -27,6 +27,7 @@ module ActsAsNestedInterval
     # Updates record, updating descendants if parent association updated,
     # in which case caller should first acquire table lock.
     def update_nested_interval
+      return if moving?
       unless node_moved?
         db_self = self.class.find(id).lock!
         write_attribute(nested_interval.foreign_key, db_self.read_attribute(nested_interval.foreign_key))
@@ -35,6 +36,20 @@ module ActsAsNestedInterval
         # No locking in this case -- caller should have acquired table lock.
         update_nested_interval_move
       end
+    end
+
+    def move!
+      return if moving?
+      self.class.nested_interval.moving = true
+      transaction do
+        yield 
+      end
+    ensure
+      self.class.nested_interval.moving = false
+    end
+
+    def moving?
+      !!self.class.nested_interval.moving
     end
     
   end

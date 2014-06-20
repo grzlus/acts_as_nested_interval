@@ -3,8 +3,14 @@ module ActsAsNestedInterval
     extend ActiveSupport::Concern
 
     included do 
+      belongs_to :parent, class_name: name, foreign_key: nested_interval.foreign_key
+      has_many :children, class_name: name, foreign_key: nested_interval.foreign_key,
+        dependent: nested_interval.dependent
+      scope :roots, -> { where(nested_interval.foreign_key => nil) }
+
       scope :ancestors_of, ->(node){ where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: node.rgt, lft: node.lft) }
-      scope :descendants_of, ->(node){ where( "id != :id AND lft BETWEEN :lft AND :rgt", id: node.id, rgt: node.rgt, lft: node.lft ) } # Simple version
+      scope :subtree_of, ->(node){ where( "lft BETWEEN :lft AND :rgt", rgt: node.rgt, lft: node.lft ) } # Simple version
+      scope :descendants_of, ->(node){ subtree_of(node).where.not(id: node.id) }
       scope :siblings_of, ->(node){ fkey = nested_interval.foreign_key; where( fkey => node.send(fkey) ).where.not(id: node.id) }
 
       if nested_interval.fraction_cache?

@@ -34,11 +34,6 @@ module ActsAsNestedInterval
 
       self.nested_interval = Configuration.new( self, **options )
 
-      belongs_to :parent, class_name: name, foreign_key: nested_interval.foreign_key
-      has_many :children, class_name: name, foreign_key: nested_interval.foreign_key,
-        dependent: nested_interval.dependent
-      scope :roots, -> { where(nested_interval.foreign_key => nil) }
-
       if self.table_exists? # Fix problem with migrating without table
         include ActsAsNestedInterval::InstanceMethods
         include ActsAsNestedInterval::Callbacks
