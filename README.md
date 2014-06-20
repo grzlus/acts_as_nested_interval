@@ -49,6 +49,7 @@ add_index :regions, :lftp
 add_index :regions, :lftq
 add_index :regions, :lft
 add_index :regions, :rgt
+add_index :regions, [:lftp, :lftq, :rgtq, :rgtp], unique: true
 ```
 
 ## Usage
@@ -59,8 +60,11 @@ point data types in the database.
 This act provides these named scopes:
 
 ```ruby
-Region.roots    # returns roots of tree.
-Region.preorder # returns records for preorder traversal.
+Region.roots								# returns roots of tree.
+Region.preorder							# returns records for preorder traversal.
+Region.ancestors_of(node)	  # returns all ancestors of given node
+Region.descendants_of(node) # returns all descendants of given node
+Region.siblings_of(node)		# returns all siblings of given node
 ```
 
 This act provides these instance methods:
@@ -70,6 +74,7 @@ Region.parent      # returns parent of record.
 Region.children    # returns children of record.
 Region.ancestors   # returns scoped ancestors of record.
 Region.descendants # returns scoped descendants of record.
+Region.siblings		 # returns scoped siblings of record.
 Region.depth       # returns depth of record.
 ```
 

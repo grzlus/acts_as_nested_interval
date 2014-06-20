@@ -7,31 +7,7 @@ module ActsAsNestedInterval
     
     # selectively define #descendants according to table features
     included do
-
       validate :disallow_circular_dependency
-
-      if nested_interval.fraction_cache?
-
-        def descendants
-          nested_interval_scope.where( "lftp > :lftp AND lft BETWEEN :lft AND :rgt", lftp: lftp, rgt: rgt, lft: lft )
-        end
-
-      else
-
-        def descendants
-          quoted_table_name = self.class.quoted_table_name
-          nested_interval_scope.where <<-SQL
-              ( #{quoted_table_name}.lftp != #{rgtp} OR
-          #{quoted_table_name}.lftq != #{rgtq}
-              ) AND
-          #{quoted_table_name}.lftp BETWEEN
-                1 + #{quoted_table_name}.lftq * CAST(#{lftp} AS BIGINT) / #{lftq} AND
-          #{quoted_table_name}.lftq * CAST(#{rgtp} AS BIGINT) / #{rgtq}
-          SQL
-        end
-
-      end
-
     end
     
     def set_nested_interval(rational)
@@ -102,19 +78,6 @@ module ActsAsNestedInterval
       db_self.descendants.update_all sql
     end
     
-    def ancestor_of?(node)
-      left < node.left && right >= node.right
-    end
-
-    def ancestors
-      nested_interval_scope.where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: rgt, lft: lft)
-    end
-
-    def siblings
-      fkey = self.class.nested_interval.foreign_key
-      self.class.where( fkey => send(fkey) ).where.not(id: self.id)
-    end
-
     # Returns depth by counting ancestors up to 0 / 1.
     def depth
       if new_record?
