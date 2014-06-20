@@ -9,37 +9,6 @@ class ActsAsNestedIntervalTest < ActiveSupport::TestCase
     assert_equal [nil, 1, 5, nil, 7, 2, nil, 4, 8], (0...9).map { |k| k.inverse(9) }
   end
 
-  def test_descendants
-    earth = Region.create name: "Earth"
-    oceania = Region.create name: "Oceania", parent: earth
-    australia = Region.create name: "Australia", parent: oceania
-    new_zealand = Region.create name: "New Zealand", parent: oceania
-    assert_equal [oceania, australia, new_zealand], earth.descendants.sort_by(&:id)
-    assert_equal [australia, new_zealand], oceania.descendants.sort_by(&:id)
-    assert_equal [], australia.descendants.sort_by(&:id)
-    assert_equal [], new_zealand.descendants.sort_by(&:id)
-  end
-
-  def test_preorder
-    earth = Region.create name: "Earth"
-    oceania = Region.create name: "Oceania", parent: earth
-    antarctica = Region.create name: "Antarctica", parent: earth
-    australia = Region.create name: "Australia", parent: oceania
-    new_zealand = Region.create name: "New Zealand", parent: oceania
-    assert_equal [earth, oceania, australia, new_zealand, antarctica], Region.preorder
-  end
-
-  def test_depth
-    earth = Region.create name: "Earth"
-    oceania = Region.create name: "Oceania", parent: earth
-    australia = Region.create name: "Australia", parent: oceania
-    new_zealand = Region.create name: "New Zealand", parent: oceania
-    assert_equal 0, earth.depth
-    assert_equal 1, oceania.depth
-    assert_equal 2, australia.depth
-    assert_equal 2, new_zealand.depth
-  end
-
   def test_move
     connection = Region.connection
     earth = Region.create name: "Earth"

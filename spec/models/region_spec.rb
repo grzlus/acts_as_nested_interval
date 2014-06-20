@@ -42,10 +42,29 @@ RSpec.describe Region, type: :model do
     end
 
     it "test ancestors" do
-      expect(earth.ancestors.to_a).to eq([])
-      expect(oceania.ancestors.to_a).to eq([ earth ])
-      expect(australia.ancestors.to_a).to eq([ earth, oceania ])
-      expect(new_zeland.ancestors.to_a).to eq([ earth, oceania ])
+      expect(earth.ancestors).to eq([])
+      expect(oceania.ancestors).to eq([ earth ])
+      expect(australia.ancestors).to eq([ earth, oceania ])
+      expect(new_zeland.ancestors).to eq([ earth, oceania ])
     end
+
+    it "test descenddants" do
+      expect(australia.descendants).to eq([])
+      expect(new_zeland.descendants).to eq([])
+      expect(oceania.descendants).to eq([ australia, new_zeland ])
+      expect(earth.descendants).to eq([oceania, australia, new_zeland])
+    end
+
+    it "test preorder" do
+      expect([earth, oceania, australia, new_zeland]).to eq(Region.preorder)
+    end
+
+    it "test depth" do
+      expect(earth.depth).to eq(0)
+      expect(oceania.depth).to eq(1)
+      expect(australia.depth).to eq(2)
+      expect(new_zeland.depth).to eq(2)
+    end
+
   end
 end

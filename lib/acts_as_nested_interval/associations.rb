@@ -6,6 +6,12 @@ module ActsAsNestedInterval
       scope :ancestors_of, ->(node){ where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: node.rgt, lft: node.lft) }
       scope :descendants_of, ->(node){ where( "id != :id AND lft BETWEEN :lft AND :rgt", id: node.id, rgt: node.rgt, lft: node.lft ) } # Simple version
       scope :siblings_of, ->(node){ fkey = nested_interval.foreign_key; where( fkey => node.send(fkey) ).where.not(id: node.id) }
+
+      if nested_interval.fraction_cache?
+        scope :preorder, -> { order(rgt: :desc, lftp: :asc) }
+      else
+        scope :preorder, -> { order('1.0 * rgtp / rgtq DESC, lftp ASC') }
+      end
     end
 
     def ancestor_of?(node)

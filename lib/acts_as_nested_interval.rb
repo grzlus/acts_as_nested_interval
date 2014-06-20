@@ -34,17 +34,6 @@ module ActsAsNestedInterval
 
       self.nested_interval = Configuration.new( self, **options )
 
-      if nested_interval.fraction_cache?
-        scope :preorder, -> { order(rgt: :desc, lftp: :asc) }
-      else
-        scope :preorder, -> { order('1.0 * rgtp / rgtq DESC, lftp ASC') }
-      end
-      # When?
-      #scope :preorder, -> { order('nested_interval_rgt(lftp, lftq) DESC, lftp ASC') }
-
-      #cattr_accessor :nested_interval_lft_index
-      #self.nested_interval_lft_index = options[:lft_index]
-
       belongs_to :parent, class_name: name, foreign_key: nested_interval.foreign_key
       has_many :children, class_name: name, foreign_key: nested_interval.foreign_key,
         dependent: nested_interval.dependent
@@ -60,4 +49,3 @@ module ActsAsNestedInterval
   end
 end
 
-#ActiveRecord::Base.send :extend, ActsAsNestedInterval
