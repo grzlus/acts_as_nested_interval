@@ -17,8 +17,10 @@ If your database supports recursive queryes (`WITH RECURSIVE`) or specific custo
 ## Install
 
 ```ruby
-# add to Gemfile
-gem 'acts_as_nested_interval'
+# add to Gemfile when you use Ruby > 2.0 or Rails >= 4.0
+gem 'acts_as_nested_interval', '~> 0.2.0'
+# Orherwise
+gem 'acts_as_nested_interval', '~> 0.1.1' # This version could have less features than actual version, check legacy branch.
 ```
 
 ```sh
