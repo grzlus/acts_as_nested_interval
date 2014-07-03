@@ -13,6 +13,7 @@ require 'acts_as_nested_interval/callbacks'
 require 'acts_as_nested_interval/instance_methods'
 require 'acts_as_nested_interval/class_methods'
 require 'acts_as_nested_interval/associations'
+require 'acts_as_nested_interval/calculate'
 
 # This act implements a nested-interval tree. You can find all descendants
 # or all ancestors with just one select query. You can insert and delete
@@ -35,11 +36,14 @@ module ActsAsNestedInterval
       self.nested_interval = Configuration.new( self, **options )
 
       if self.table_exists? # Fix problem with migrating without table
+        include ActsAsNestedInterval::Calculate
         include ActsAsNestedInterval::InstanceMethods
         include ActsAsNestedInterval::Callbacks
         include ActsAsNestedInterval::Associations
         extend ActsAsNestedInterval::ClassMethods
       end
+
+      calculate(*([:lft, :rgt, :rgtq, :rgtp] & self.columns.map {|c| c.name.to_sym }))
     end
   end
 end

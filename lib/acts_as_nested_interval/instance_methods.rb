@@ -5,17 +5,20 @@ module ActsAsNestedInterval
 
     extend ActiveSupport::Concern
     
-    # selectively define #descendants according to table features
     included do
       validate :disallow_circular_dependency
     end
     
     def set_nested_interval(rational)
       self.lftp, self.lftq = rational.numerator, rational.denominator
-      self.rgtp = rgtp if has_attribute?(:rgtp)
-      self.rgtq = rgtq if has_attribute?(:rgtq)
-      self.lft = lft if has_attribute?(:lft)
-      self.rgt = rgt if has_attribute?(:rgt)
+      [:lft, :rgtq, :rgtp, :rgt].each do |attr|
+        send("#{attr}=", nil)
+        send(attr)
+      end
+      #self.rgtp = rgtp if has_attribute?(:rgtp)
+      #self.rgtq = rgtq if has_attribute?(:rgtq)
+      #self.lft = lft if has_attribute?(:lft)
+      #self.rgt = rgt if has_attribute?(:rgt)
     end
     
     def nested_interval_scope
@@ -49,54 +52,9 @@ module ActsAsNestedInterval
       self.recalculate_nested_interval!
     end
     
-    # Returns depth by counting ancestors up to 0 / 1.
-    def depth
-      if new_record?
-        if parent.nil?
-          return 0
-        else
-          return parent.depth + 1
-        end
-      else
-        n = 0
-        p, q = lftp, lftq
-        while p != 0
-          x = p.inverse(q)
-          p, q = (x * p - 1) / q, x
-          n += 1
-        end
-        return n
-      end
-    end
-
-    def lft; 1.0 * lftp / lftq end
-    def rgt; 1.0 * rgtp / rgtq end
-
-    # Returns numerator of right end of interval.
-    def rgtp
-      case lftp
-      when 0 then 1
-      when 1 then 1
-      else lftq.inverse(lftp)
-      end
-    end
-
-    # Returns denominator of right end of interval.
-    def rgtq
-      case lftp
-      when 0 then 1
-      when 1 then lftq - 1
-      else (lftq.inverse(lftp) * lftq - 1) / lftp
-      end
-    end
-
     # Returns left end of interval for next child.
     def next_child_lft
-      if child = children.order('lftq DESC').first
-        return left.mediant( child.left )
-      else
-        return left.mediant( right )
-      end
+      left.mediant( children.last.try(:left) || right )
     end
     
     # Returns left end of interval for next root.
