@@ -9,7 +9,7 @@ module ActsAsNestedInterval
       scope :roots, -> { where(nested_interval.foreign_key => nil) }
 
       scope :ancestors_of, ->(node){ where("rgt >= CAST(:rgt AS FLOAT) AND lft < CAST(:lft AS FLOAT)", rgt: node.rgt, lft: node.lft) }
-      scope :subtree_of, ->(node){ where( "lft >= :lft AND lft <= :rgt", rgt: node.rgt, lft: node.lft ) } # Simple version
+      scope :subtree_of, ->(node){ where( "lft >= :lft AND rgt <= :rgt", rgt: node.rgt, lft: node.lft ) } # Simple version
       scope :descendants_of, ->(node){ subtree_of(node).where.not(id: node.id) }
       scope :siblings_of, ->(node){ fkey = nested_interval.foreign_key; where( fkey => node.send(fkey) ).where.not(id: node.id) }
 
