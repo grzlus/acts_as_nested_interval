@@ -6,6 +6,7 @@
 
 require 'acts_as_nested_interval/core_ext/integer'
 require 'acts_as_nested_interval/core_ext/rational'
+require 'acts_as_nested_interval/core_ext/arel'
 require 'acts_as_nested_interval/version'
 require 'acts_as_nested_interval/constants'
 require 'acts_as_nested_interval/configuration'
@@ -14,6 +15,7 @@ require 'acts_as_nested_interval/instance_methods'
 require 'acts_as_nested_interval/class_methods'
 require 'acts_as_nested_interval/associations'
 require 'acts_as_nested_interval/calculate'
+require 'acts_as_nested_interval/moving'
 
 # This act implements a nested-interval tree. You can find all descendants
 # or all ancestors with just one select query. You can insert and delete
@@ -37,6 +39,7 @@ module ActsAsNestedInterval
 
       if self.table_exists? # Fix problem with migrating without table
         include ActsAsNestedInterval::Calculate
+        include ActsAsNestedInterval::Moving
         include ActsAsNestedInterval::InstanceMethods
         include ActsAsNestedInterval::Callbacks
         include ActsAsNestedInterval::Associations

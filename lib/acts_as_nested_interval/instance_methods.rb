@@ -1,4 +1,5 @@
 using Mediant
+using ArelHack
 
 module ActsAsNestedInterval
   module InstanceMethods
@@ -29,29 +30,6 @@ module ActsAsNestedInterval
       self.class.where conditions
     end
 
-    def recalculate_nested_interval!
-      move! do
-        lftr = parent.present? ? parent.next_child_lft : next_root_lft
-        set_nested_interval( lftr )
-        save!
-        self.recalculate_nested_interval!
-        children.preorder.map(&:recalculate_nested_interval!)
-      end
-    end
-
-    # Rewrite method
-    def update_nested_interval_move
-      return unless self.class.nested_interval.moveable?
-
-      if parent.present? and self.ancestor_of?(parent)
-        errors.add nested_interval.foreign_key, "is descendant"
-        raise ActiveRecord::RecordInvalid, self
-      end
-
-      # TODO: Do it by DB
-      self.recalculate_nested_interval!
-    end
-    
     # Returns left end of interval for next child.
     def next_child_lft
       left.mediant( children.last.try(:left) || right )
