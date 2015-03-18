@@ -10,7 +10,7 @@ a full table update (compared to nested set, where at insert, half the table is 
 Make sure you really need this, otherwise give a look to https://github.com/stefankroes/ancestry ,
 that implements a simpler encoding model (variant of materialized path).  
 
-If your database supports recursive queryes (`WITH RECURSIVE`) or specific custom extensions
+If your database supports recursive queries (`WITH RECURSIVE`) or specific custom extensions
 (`CONNECT BY`, ltree) and you don't need portability, you're probably better off using those.
 
 
@@ -19,7 +19,7 @@ If your database supports recursive queryes (`WITH RECURSIVE`) or specific custo
 ```ruby
 # add to Gemfile when you use Ruby > 2.0 or Rails >= 4.0
 gem 'acts_as_nested_interval', '~> 0.2.0'
-# Orherwise
+# Otherwise
 gem 'acts_as_nested_interval', '~> 0.1.1' # This version could have less features than actual version, check legacy branch.
 ```
 
